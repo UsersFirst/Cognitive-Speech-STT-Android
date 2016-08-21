@@ -16,3 +16,6 @@ build/
 
 # Local config (e.g. sdk path)
 local.properties
+
+# key values XML file
+samples/SpeechRecoExample/res/values/key.xml
