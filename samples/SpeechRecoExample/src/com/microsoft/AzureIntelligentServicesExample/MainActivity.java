@@ -34,8 +34,11 @@ package com.microsoft.AzureIntelligentServicesExample;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -50,6 +53,9 @@ import com.microsoft.projectoxford.speechrecognition.RecognitionStatus;
 import com.microsoft.projectoxford.speechrecognition.SpeechRecognitionMode;
 import com.microsoft.projectoxford.speechrecognition.SpeechRecognitionServiceFactory;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends Activity implements ISpeechRecognitionServerEvents
@@ -329,6 +335,19 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
             for (int i = 0; i < response.Results.length; i++) {
                 this.WriteLine("[" + i + "]" + " Confidence=" + response.Results[i].Confidence +
                                   " Text=\"" + response.Results[i].DisplayText + "\"");
+
+                SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+                Set speechSet = sharedPref.getStringSet("speechSet", Collections.synchronizedSet(new HashSet()));
+                speechSet.add(response.Results[i].DisplayText);
+
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putStringSet("speechSet", speechSet);
+                editor.commit();
+
+                this.WriteLine("***************  Current Shared Preference Data **************");
+                this.WriteLine(speechSet.toString());
+
+                Log.w("Current SharedPref Set:", speechSet.toString());
             }
 
             this.WriteLine();
