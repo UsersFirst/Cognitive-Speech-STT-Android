@@ -65,6 +65,7 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
     MicrophoneRecognitionClient micClient = null;
     FinalResponseStatus isReceivedResponse = FinalResponseStatus.NotReceived;
     EditText _logText;
+    EditText _logTextFinal;
     RadioGroup _radioGroup;
     Button _buttonSelectMode;
     Button _startButton;
@@ -166,6 +167,9 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
         setContentView(R.layout.activity_main);
 
         this._logText = (EditText) findViewById(R.id.editText1);
+        _logText.setKeyListener(null);
+        this._logTextFinal = (EditText) findViewById(R.id.editText);
+        _logTextFinal.setKeyListener(null);
         this._radioGroup = (RadioGroup)findViewById(R.id.groupMode);
         this._buttonSelectMode = (Button)findViewById(R.id.buttonSelectMode);
         this._startButton = (Button) findViewById(R.id.button1);
@@ -190,7 +194,7 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
         this._buttonSelectMode.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                This.ShowMenu(This._radioGroup.getVisibility() == View.INVISIBLE);
+                This.ShowMenu(This._radioGroup.getVisibility() == View.GONE);
             }
         });
 
@@ -208,10 +212,13 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
         if (show) {
             this._radioGroup.setVisibility(View.VISIBLE);
             this._logText.setVisibility(View.INVISIBLE);
+            this._logTextFinal.setVisibility(View.INVISIBLE);
         } else {
-            this._radioGroup.setVisibility(View.INVISIBLE);
+            this._radioGroup.setVisibility(View.GONE);
             this._logText.setText("");
             this._logText.setVisibility(View.VISIBLE);
+            this._logTextFinal.setText("");
+            this._logTextFinal.setVisibility(View.VISIBLE);
         }
     }
     /**
@@ -336,6 +343,8 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
                 this.WriteLine("[" + i + "]" + " Confidence=" + response.Results[i].Confidence +
                                   " Text=\"" + response.Results[i].DisplayText + "\"");
 
+                this._logTextFinal.setText(response.Results[i].DisplayText);
+
                 SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
                 Set speechSet = sharedPref.getStringSet("speechSet", Collections.synchronizedSet(new HashSet()));
                 speechSet.add(response.Results[i].DisplayText);
@@ -367,6 +376,7 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
         this.WriteLine("--- Partial result received by onPartialResponseReceived() ---");
         this.WriteLine(response);    
         this.WriteLine();
+        this._logTextFinal.setText(response);
     }
     
     public void onError(final int errorCode, final String response) {
@@ -407,7 +417,9 @@ public class MainActivity extends Activity implements ISpeechRecognitionServerEv
      * @param text The line to write.
      */
     private void WriteLine(String text) {
+
         this._logText.append(text + "\n");
+
     }
 
     /**
